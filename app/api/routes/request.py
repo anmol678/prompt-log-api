@@ -7,7 +7,7 @@ from app.schemas.score import Score
 
 router = APIRouter()
 
-@router.post("/request")
+@router.post("/request", response_model=RequestResponse)
 def track_request(*, db: Session = Depends(dependencies.get_db), request_in: Request) -> RequestResponse:
     log = crud_log.create(db=db, request=request_in)
     if not log:

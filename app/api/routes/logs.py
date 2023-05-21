@@ -4,10 +4,11 @@ from app import dependencies
 from app.crud import crud_log
 from app.schemas.log import Log
 
+
 router = APIRouter()
 
 @router.get("/logs", response_model=list[Log])
-def get_logs(*, db: Session = Depends(dependencies.get_db), tags: list[str]) -> list[Log]:
+def get_logs(*, db: Session = Depends(dependencies.get_db)):
     logs = crud_log.get_logs(db=db)
     return logs
 
