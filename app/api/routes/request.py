@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import dependencies
-from app.crud import crud_log, crud_score
+from app.crud import crud_log
 from app.schemas.request import Request, RequestResponse
 from app.schemas.score import Score
 
@@ -20,13 +20,14 @@ def track_request(*, db: Session = Depends(dependencies.get_db), request_in: Req
 
 @router.post("/request/score")
 def track_score(*, db: Session = Depends(dependencies.get_db), score_in: Score) -> Score:
-    score = crud_score.create(db=db, score=score_in)
-    if not score:
-        raise HTTPException(
-            status_code=400,
-            detail="Error while creating score",
-        )
-    return score
+    # score = crud_score.create(db=db, score=score_in)
+    # if not score:
+    #     raise HTTPException(
+    #         status_code=400,
+    #         detail="Error while creating score",
+    #     )
+    # return score
+    return Score()
 
 # @router.post("/request/metadata")
 # def track_metadata(*, db: Session = Depends(dependencies.get_db), metadata: dict) -> dict:

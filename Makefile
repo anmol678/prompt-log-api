@@ -7,7 +7,15 @@ test:
 	source venv/bin/activate && pytest
 
 run:
-	source venv/bin/activate && python app/main.py
+	source venv/bin/activate && uvicorn main:app --reload
+
+migration:
+	@if [ -z "$(message)" ]; then \
+		echo "Please provide a migration message. Example: make migrate message='Version 1'"; \
+	else \
+		source venv/bin/activate && alembic revision --autogenerate -m "$(message)"; \
+		alembic upgrade head; \
+	fi
 
 lint:
 	source venv/bin/activate && flake8 app
