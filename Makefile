@@ -7,12 +7,12 @@ test:
 	source venv/bin/activate && pytest
 
 run:
-	source venv/bin/activate && python src/main.py
+	source venv/bin/activate && python app/main.py
 
 lint:
-	source venv/bin/activate && flake8 src
+	source venv/bin/activate && flake8 app
 
 format:
-	source venv/bin/activate && black src
+	source venv/bin/activate && black app
 
 .PHONY: init test run lint format
