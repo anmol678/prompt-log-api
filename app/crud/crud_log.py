@@ -5,20 +5,20 @@ from datetime import datetime
 from app.utils.cost import CostCalculator
 
 
-def create(db: Session, obj_in: Request):
+def create(db: Session, obj_in: Request) -> Log:
     db_log = request_to_log(request=obj_in)
     db.add(db_log)
     db.commit()
     db.refresh(db_log)
     return db_log
 
-def get(db: Session, id: int):
+def get(db: Session, id: int) -> Log:
     return db.query(Log).options(joinedload(Log.project)).filter(Log.id == id).first()
 
-def get_multi(db: Session, skip: int = 0, limit: int = 100):
+def get_multi(db: Session, skip: int = 0, limit: int = 100) -> list[Log]:
     return db.query(Log).options(joinedload(Log.project)).offset(skip).limit(limit).all()
 
-def update(db: Session, db_obj: Log, obj_in: Log):
+def update(db: Session, db_obj: Log, obj_in: Log) -> Log:
     for key, value in obj_in.dict().items():
         setattr(db_obj, key, value)
     db.commit()
@@ -30,7 +30,7 @@ def delete(db: Session, id: int):
     db.delete(db_obj)
     db.commit()
 
-def request_to_log(*, request: Request):
+def request_to_log(*, request: Request) -> Log:
 
     # project, metadata, score, prompt_template
 

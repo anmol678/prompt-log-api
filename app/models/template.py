@@ -9,18 +9,19 @@ class Template(BaseModel):
     template_format: str
 
 class PromptTemplateBase(BaseModel):
-    created_at: datetime
-    deleted: bool
-    id: int
-    last_used: datetime | None
     prompt_name: str
     prompt_template: Template
     tags: list[str]
+    last_used: datetime | None
+
+class PromptTemplateCreate(PromptTemplateBase):
+    pass
 
 class PromptTemplate(PromptTemplateBase):
-    versions: list[PromptTemplateBase]
+    id: int
+    created_at: datetime
+    
+    versions: list[PromptTemplateBase] | None = None
 
-class PromptTemplateMutate(BaseModel):
-    prompt_name: str
-    prompt_template: Template
-    tags: list[str]
+    class Config:
+        orm_mode = True

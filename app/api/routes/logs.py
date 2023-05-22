@@ -1,15 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import dependencies
-from app.crud import crud_log
 from app.models.log import Log
 from app.models.request import Request, RequestResponse
+from app.crud import crud_log
 
 
 router = APIRouter()
 
 @router.post("/logs", response_model=RequestResponse)
-def create_log(*, db: Session = Depends(dependencies.get_db), request_in: Request) -> RequestResponse:
+def create_log(*, db: Session = Depends(dependencies.get_db), request_in: Request):
     log = crud_log.create(db=db, obj_in=request_in)
     if not log:
         raise HTTPException(
@@ -20,13 +20,13 @@ def create_log(*, db: Session = Depends(dependencies.get_db), request_in: Reques
 
 
 @router.get("/logs", response_model=list[Log])
-def get_logs(*, db: Session = Depends(dependencies.get_db)) -> list[Log]:
+def get_logs(*, db: Session = Depends(dependencies.get_db)):
     logs = crud_log.get_multi(db=db)
     return logs
 
 
 @router.get("/logs/{id}", response_model=Log)
-def get_log(*, db: Session = Depends(dependencies.get_db), id: int) -> Log:
+def get_log(*, db: Session = Depends(dependencies.get_db), id: int):
     log = crud_log.get(db=db, id=id)
     if not log:
         raise HTTPException(

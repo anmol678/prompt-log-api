@@ -6,7 +6,7 @@ from sqlalchemy import pool
 from alembic import context
 
 from app.sqlite.db import Base
-from app.sqlite.schemas import Project, Log
+from app.sqlite.schemas import Project, PromptTemplate, Log
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
