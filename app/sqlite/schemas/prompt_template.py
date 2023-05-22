@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, JSON
 from app.sqlite.db import Base
 
+
 class PromptTemplate(Base):
     __tablename__ = "prompt_templates"
 

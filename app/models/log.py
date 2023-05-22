@@ -1,10 +1,9 @@
 from pydantic import BaseModel
 from datetime import datetime
+from .project import Project
 
 
-class Log(BaseModel):
-    id: int
-    
+class LogBase(BaseModel):
     function_name: str
     prompt: list | dict
     kwargs: dict
@@ -17,8 +16,18 @@ class Log(BaseModel):
     token_usage: dict
     cost: float
 
-    # project_id: int | None = None
     tags: list[str]
+
+class LogCreate(LogBase):
+    project_id: int | None = None
+
+class Log(LogBase):
+    id: int
+    project: Project | None = None
+
+    class Config:
+        orm_mode = True
+    
 
     # metadata: dict[str, str | None]
     
@@ -27,7 +36,3 @@ class Log(BaseModel):
     # prompt_version_number: int | None
 
     # score: int | None
-        
-    class Config:
-        orm_mode = True
-    

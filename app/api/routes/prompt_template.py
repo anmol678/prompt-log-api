@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import dependencies
-from app.schemas.prompt_template import PromptTemplate, PromptTemplateMutate
+from app.models.prompt_template import PromptTemplate, PromptTemplateMutate
 from app.crud import crud_prompt_template
 
 router = APIRouter()

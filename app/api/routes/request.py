@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import dependencies
 from app.crud import crud_log
-from app.schemas.request import Request, RequestResponse
-from app.schemas.score import Score
+from app.models.request import Request, RequestResponse
+from app.models.score import Score
 
 router = APIRouter()
 

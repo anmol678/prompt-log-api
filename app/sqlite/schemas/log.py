@@ -22,14 +22,12 @@ class Log(Base):
 
     tags = Column(JSON)
 
-    # project_id = Column(Integer, ForeignKey('projects.id'), nullable=True)
-    # project = relationship('Project', back_populates='logs')
+    project_id = Column(Integer, ForeignKey('projects.id'), nullable=True)
+    project = relationship('Project', back_populates='logs')
 
     # metadata = Column(JSON)
     # score = Column(Integer)
 
     # prompt_id = Column(String)
     # prompt_input_variables = Column(JSON)
-    # prompt_version_number = Column(Integer)
-    
-    
+    # prompt_version_number = Column(Integer)    

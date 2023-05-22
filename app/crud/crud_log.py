@@ -1,8 +1,9 @@
-from sqlalchemy.orm import Session
-from app.schemas.request import Request
-from app.sqlite.models.log import Log
+from sqlalchemy.orm import Session, joinedload
+from app.models.request import Request
+from app.sqlite.schemas.log import Log
 from datetime import datetime
 from app.utils.cost import CostCalculator
+
 
 def create(db: Session, request: Request):
     db_log = request_to_log(request=request)
@@ -12,10 +13,10 @@ def create(db: Session, request: Request):
     return db_log
 
 def get(db: Session, log_id: int):
-    return db.query(Log).filter(Log.id == log_id).first()
+    return db.query(Log).options(joinedload(Log.project)).filter(Log.id == log_id).first()
 
 def get_logs(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(Log).offset(skip).limit(limit).all()
+    return db.query(Log).options(joinedload(Log.project)).offset(skip).limit(limit).all()
 
 def update(db: Session, log: Log):
     db_log = get(db, log.id)
@@ -49,7 +50,7 @@ def request_to_log(*, request: Request):
         provider_type=request.provider_type,
         token_usage=request.request_usage,
         cost=CostCalculator().calculate_cost(usage=request.request_usage, kwargs=request.function_kwargs),
-        # project_id=request.project_id,
+        project_id=request.project_id,
         tags=request.tags,
 
         # prompt_id=request.prompt_id,

@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+
 class Request(BaseModel):
     function_name: str
     function_args: list | dict
@@ -13,6 +14,7 @@ class Request(BaseModel):
     request_end_time: datetime
     request_usage: dict
     
+    project_id: int | None = None
     tags: list[str] | None = None
     
     # prompt_id: str | None = None
