@@ -5,30 +5,29 @@ from datetime import datetime
 from app.utils.cost import CostCalculator
 
 
-def create(db: Session, request: Request):
-    db_log = request_to_log(request=request)
+def create(db: Session, obj_in: Request):
+    db_log = request_to_log(request=obj_in)
     db.add(db_log)
     db.commit()
     db.refresh(db_log)
     return db_log
 
-def get(db: Session, log_id: int):
-    return db.query(Log).options(joinedload(Log.project)).filter(Log.id == log_id).first()
+def get(db: Session, id: int):
+    return db.query(Log).options(joinedload(Log.project)).filter(Log.id == id).first()
 
-def get_logs(db: Session, skip: int = 0, limit: int = 100):
+def get_multi(db: Session, skip: int = 0, limit: int = 100):
     return db.query(Log).options(joinedload(Log.project)).offset(skip).limit(limit).all()
 
-def update(db: Session, log: Log):
-    db_log = get(db, log.id)
-    for key, value in log.dict().items():
-        setattr(db_log, key, value)
+def update(db: Session, db_obj: Log, obj_in: Log):
+    for key, value in obj_in.dict().items():
+        setattr(db_obj, key, value)
     db.commit()
-    db.refresh(db_log)
-    return db_log
+    db.refresh(db_obj)
+    return db_obj
 
-def delete(db: Session, log_id: int):
-    db_log = get(db, log_id)
-    db.delete(db_log)
+def delete(db: Session, id: int):
+    db_obj = get(db, id)
+    db.delete(db_obj)
     db.commit()
 
 def request_to_log(*, request: Request):
