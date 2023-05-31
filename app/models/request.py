@@ -14,7 +14,7 @@ class Request(BaseModel):
     request_end_time: datetime
     request_usage: dict
     
-    tags: list[str] | None = None
+    tags: list[str] | None = []
     metadata: dict | None = None
 
 class RequestResponse(BaseModel):

@@ -4,7 +4,7 @@ from datetime import datetime
 
 class ProjectBase(BaseModel):
     title: str
-    tags: list[str]
+    tags: list[str] = []
 
 class ProjectCreate(ProjectBase):
     pass
