@@ -15,6 +15,7 @@ class Request(BaseModel):
     request_usage: dict
     
     tags: list[str] | None = None
+    metadata: dict | None = None
 
 class RequestResponse(BaseModel):
     request_id: int

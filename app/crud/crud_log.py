@@ -4,10 +4,11 @@ from app.models.request import Request
 from app.sqlite.schemas.log import Log
 from datetime import datetime
 from app.utils.cost import CostCalculator
+from app.crud import crud_project
 
 
 def create(db: Session, obj_in: Request) -> Log:
-    db_log = request_to_log(request=obj_in)
+    db_log = request_to_log(db, request=obj_in)
     db.add(db_log)
     db.commit()
     db.refresh(db_log)
@@ -31,7 +32,7 @@ def delete(db: Session, id: int):
     db.delete(db_obj)
     db.commit()
 
-def request_to_log(*, request: Request) -> Log:
+def request_to_log(db: Session, request: Request) -> Log:
 
     # project, metadata, score, prompt_template
 
@@ -50,8 +51,11 @@ def request_to_log(*, request: Request) -> Log:
         provider_type=request.provider_type,
         token_usage=request.request_usage,
         cost=CostCalculator().calculate_cost(usage=request.request_usage, kwargs=request.function_kwargs),
-        project_id=request.project_id,
+        
         tags=request.tags,
+        project_id=(crud_project.get_or_create(db, request.metadata['project']).id 
+                    if request.metadata and 'project' in request.metadata else None)
+
 
         # prompt_id=request.prompt_id,
         # prompt_input_variables=request.prompt_input_variables,
