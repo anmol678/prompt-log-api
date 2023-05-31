@@ -3,17 +3,19 @@ from sqlalchemy.orm import Session
 from app import dependencies
 from app.models.project import Project, ProjectCreate
 from app.crud import crud_project
+from app.models.exceptions import DatabaseError
 
 
 router = APIRouter()
 
 @router.post("/project", response_model=Project)
 def create_project(*, db: Session = Depends(dependencies.get_db), project_in: ProjectCreate):
-    project = crud_project.create(db=db, obj_in=project_in)
-    if not project:
+    try:
+        project = crud_project.create(db=db, obj_in=project_in)
+    except DatabaseError as e:
         raise HTTPException(
-            status_code=400,
-            detail="Error while creating Project",
+            status_code=e.code,
+            detail=str(e.message),
         )
     return project
 
