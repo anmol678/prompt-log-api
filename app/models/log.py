@@ -18,9 +18,6 @@ class LogBase(BaseModel):
 
     tags: list[str]
 
-class LogCreate(LogBase):
-    project_id: int | None = None
-
 class Log(LogBase):
     id: int
     project: Project | None = None
