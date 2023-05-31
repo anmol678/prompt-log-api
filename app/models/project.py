@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 class ProjectBase(BaseModel):
-    name: str
+    title: str
     tags: list[str]
 
 class ProjectCreate(ProjectBase):

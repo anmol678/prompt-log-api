@@ -7,7 +7,7 @@ class Project(Base):
     __tablename__ = 'projects'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    title = Column(String)
     tags = Column(JSON)
 
     logs = relationship('Log', back_populates='project')
