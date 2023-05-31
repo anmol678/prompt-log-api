@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import desc
 from app.models.request import Request
 from app.sqlite.schemas.log import Log
 from datetime import datetime
@@ -16,7 +17,7 @@ def get(db: Session, id: int) -> Log:
     return db.query(Log).options(joinedload(Log.project)).filter(Log.id == id).first()
 
 def get_multi(db: Session, skip: int = 0, limit: int = 100) -> list[Log]:
-    return db.query(Log).options(joinedload(Log.project)).offset(skip).limit(limit).all()
+    return db.query(Log).options(joinedload(Log.project)).order_by(desc(Log.request_start_time)).offset(skip).limit(limit).all()
 
 def update(db: Session, db_obj: Log, obj_in: Log) -> Log:
     for key, value in obj_in.dict().items():
