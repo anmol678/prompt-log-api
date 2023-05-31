@@ -28,7 +28,7 @@ class CostCalculator:
         """
         Calculate cost & usage for a single round trip (request -> response)
         """
-        model = kwargs["model"]
+        model = kwargs.get("model") or kwargs.get("model_name")
         
         prompt_tokens = usage["prompt_tokens"]
         completion_tokens = usage["completion_tokens"]
