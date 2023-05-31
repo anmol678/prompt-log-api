@@ -30,7 +30,7 @@ def get_or_create(db: Session, title: str) -> Project:
     if project:
         return project
     else:
-        return create(db, obj_in={ "title": title })
+        return create(db, obj_in=ProjectCreate(title=title))
 
 def update(db: Session, db_obj: Project, obj_in: ProjectCreate) -> Project:
     for key, value in obj_in.dict().items():
