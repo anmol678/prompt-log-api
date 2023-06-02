@@ -36,3 +36,14 @@ def get_template(*, db: Session = Depends(dependencies.get_db), id: int):
             detail="Prompt Template not found",
         )
     return template
+
+
+@router.patch("/prompt-templates/{id}", response_model=PromptTemplate)
+def update_prompt_template(*, db: Session = Depends(dependencies.get_db), id: int, prompt_template_in: PromptTemplatePatch):
+    db_prompt_template = crud_prompt_template.update_with_template(db, id=id, prompt_template=prompt_template_in)
+    if db_prompt_template is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Prompt Template not found",
+        )
+    return db_prompt_template

@@ -58,4 +58,29 @@ def get_multi(db: Session, skip: int = 0, limit: int = 100) -> list[PromptTempla
         .all()
     )
 
+def update_with_template(db: Session, id: int, prompt_template: PromptTemplatePatch) -> PromptTemplate:
+    db_prompt_template = get(db, id=id)
+
+    if db_prompt_template is None:
+        raise DatabaseError("Prompt Template not found")
+
+    if prompt_template.title is not None:
+        db_prompt_template.title = prompt_template.title
+
+    if prompt_template.tags is not None:
+        db_prompt_template.tags = prompt_template.tags
+
+    if prompt_template.project is not None:
+        db_prompt_template.project_id = crud_project.get_or_create(db, title=prompt_template.project).id
     
+    if prompt_template.template is not None:
+        create_template(db, template=prompt_template.template, parent_template_id=id)
+
+    db.commit()
+    db.refresh(db_prompt_template)
+    return db_prompt_template
+
+def delete(db: Session, id: int):
+    db_obj = get(db, id=id)
+    db.delete(db_obj)
+    db.commit()

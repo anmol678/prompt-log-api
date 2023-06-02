@@ -41,3 +41,8 @@ class PromptTemplate(PromptTemplateBase):
     class Config:
         orm_mode = True
         
+class PromptTemplatePatch(BaseModel):
+    title: str | None = None
+    tags: list[str] | None = None
+    template: TemplateCreate | None = None
+    project: str | None = None
