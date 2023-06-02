@@ -8,6 +8,7 @@ from app.crud import crud_log
 
 router = APIRouter()
 
+
 @router.post("/logs", response_model=RequestResponse)
 def create_log(*, db: Session = Depends(dependencies.get_db), request_in: Request):
     log = crud_log.create(db, request=request_in)
@@ -34,3 +35,14 @@ def get_log(*, db: Session = Depends(dependencies.get_db), id: int):
             detail="Log not found",
         )
     return log
+
+
+@router.get("/logs/prompt-template/{prompt_template_id}", response_model=list[Log])
+def get_logs_for_prompt_template(*, db: Session = Depends(dependencies.get_db), prompt_template_id: int):
+    logs = crud_log.get_for_prompt_template(db, prompt_template_id=prompt_template_id)
+    if not logs:
+        raise HTTPException(
+            status_code=404,
+            detail="Logs not found",
+        )
+    return logs

@@ -4,7 +4,7 @@ from app.models.request import Request
 from app.sqlite.schemas.log import Log
 from datetime import datetime
 from app.utils.cost import CostCalculator
-from app.crud import crud_project
+from app.crud import crud_project, crud_prompt_template_log
 
 
 def create(db: Session, request: Request) -> Log:
@@ -36,6 +36,19 @@ def get(db: Session, ids: list[int]) -> list[Log]:
         .filter(Log.id.in_(ids))
         .all()
     )
+
+def get_for_prompt_template(db: Session, prompt_template_id: int) -> list[Log]:
+    pt_logs = crud_prompt_template_log.get_by_prompt_template(db, id=prompt_template_id)
+    log_ids = [pt_log.log_id for pt_log in pt_logs]
+    logs = get(db, ids=log_ids)
+    log_id_to_version = {pt_log.log_id: pt_log.version_number for pt_log in pt_logs}
+
+    for log in logs:
+        log_dict = log.dict()
+        log_dict['version_number'] = log_id_to_version[log.id]
+        logs.append(log_dict)
+
+    return logs
 
 def update(db: Session, db_obj: Log, obj_in: Log) -> Log:
     for key, value in obj_in.dict().items():
