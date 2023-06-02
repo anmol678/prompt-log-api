@@ -10,7 +10,7 @@ router = APIRouter()
 
 @router.post("/logs", response_model=RequestResponse)
 def create_log(*, db: Session = Depends(dependencies.get_db), request_in: Request):
-    log = crud_log.create(db=db, request=request_in)
+    log = crud_log.create(db, request=request_in)
     if not log:
         raise HTTPException(
             status_code=400,
@@ -21,13 +21,13 @@ def create_log(*, db: Session = Depends(dependencies.get_db), request_in: Reques
 
 @router.get("/logs", response_model=list[Log])
 def get_logs(*, db: Session = Depends(dependencies.get_db)):
-    logs = crud_log.get_multi(db=db)
+    logs = crud_log.get_multi(db)
     return logs
 
 
 @router.get("/logs/{id}", response_model=Log)
 def get_log(*, db: Session = Depends(dependencies.get_db), id: int):
-    log = crud_log.get(db=db, id=id)
+    log = crud_log.get(db, id=id)
     if not log:
         raise HTTPException(
             status_code=404,

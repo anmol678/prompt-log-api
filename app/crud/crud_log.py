@@ -64,6 +64,6 @@ def request_to_log(db: Session, request: Request) -> Log:
         cost=CostCalculator().calculate_cost(usage=request.request_usage, kwargs=request.function_kwargs),
         
         tags=request.tags,
-        project_id=(crud_project.get_or_create(db, request.metadata['project']).id 
+        project_id=(crud_project.get_or_create(db, project=request.metadata['project']).id 
                     if request.metadata and 'project' in request.metadata else None)
     )

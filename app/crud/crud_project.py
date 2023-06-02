@@ -5,7 +5,7 @@ from app.models.exceptions import DatabaseError
 
 
 def create(db: Session, project: ProjectCreate) -> Project:
-    existing_project = get_by_title(db, project.title)
+    existing_project = get_by_title(db, title=project.title)
     if existing_project:
         raise DatabaseError("A project with this title already exists.")
     db_project = Project(**project.dict())
@@ -26,7 +26,7 @@ def get_multi(db: Session, skip: int = 0, limit: int = 100) -> list[Project]:
     return db.query(Project).offset(skip).limit(limit).all()
 
 def get_or_create(db: Session, title: str) -> Project:
-    project = get_by_title(db, title)
+    project = get_by_title(db, title=title)
     if project:
         return project
     else:
