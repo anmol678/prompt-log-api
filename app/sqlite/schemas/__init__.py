@@ -1,4 +1,4 @@
 
 from .log import Log
 from .project import Project
-from .template import PromptTemplate
+from .prompt_template import PromptTemplate, Template
