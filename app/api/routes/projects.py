@@ -8,6 +8,7 @@ from app.models.exceptions import DatabaseError
 
 router = APIRouter()
 
+
 @router.post("/projects", response_model=Project)
 def create_project(*, db: Session = Depends(dependencies.get_db), project_in: ProjectCreate):
     try:
