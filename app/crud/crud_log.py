@@ -30,7 +30,7 @@ def get_multi(db: Session, skip: int = 0, limit: int = 100) -> list[Log]:
         .all()
     )
 
-def get(db: Session, ids: list[int]) -> list[Log]:
+def get_multi_by_id(db: Session, ids: list[int]) -> list[Log]:
     return (
         db.query(Log)
         .filter(Log.id.in_(ids))
@@ -40,7 +40,7 @@ def get(db: Session, ids: list[int]) -> list[Log]:
 def get_for_prompt_template(db: Session, prompt_template_id: int) -> list[Log]:
     pt_logs = crud_prompt_template_log.get_by_prompt_template(db, id=prompt_template_id)
     log_ids = [pt_log.log_id for pt_log in pt_logs]
-    logs = get(db, ids=log_ids)
+    logs = get_multi_by_id(db, ids=log_ids)
     log_id_to_version = {pt_log.log_id: pt_log.version_number for pt_log in pt_logs}
 
     for log in logs:
@@ -58,7 +58,7 @@ def update(db: Session, db_obj: Log, obj_in: Log) -> Log:
     return db_obj
 
 def delete(db: Session, id: int):
-    db_obj = get(db, id)
+    db_obj = get(db, id=id)
     db.delete(db_obj)
     db.commit()
 
@@ -77,6 +77,6 @@ def request_to_log(db: Session, request: Request) -> Log:
         cost=CostCalculator().calculate_cost(usage=request.request_usage, kwargs=request.function_kwargs),
         
         tags=request.tags,
-        project_id=(crud_project.get_or_create(db, project=request.metadata['project']).id 
+        project_id=(crud_project.get_or_create(db, title=request.metadata['project']).id 
                     if request.metadata and 'project' in request.metadata else None)
     )

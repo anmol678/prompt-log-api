@@ -40,7 +40,7 @@ def update(db: Session, db_obj: Project, project: ProjectCreate) -> Project:
     return db_obj
 
 def delete(db: Session, id: int):
-    db_obj = get(db, id)
+    db_obj = get(db, id=id)
     db.delete(db_obj)
     db.commit()
     

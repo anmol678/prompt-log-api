@@ -52,7 +52,6 @@ def get(db: Session, id: int) -> PromptTemplate:
 def get_multi(db: Session, skip: int = 0, limit: int = 100) -> list[PromptTemplate]:
     return (
         db.query(PromptTemplate)
-        .order_by(desc(PromptTemplate.created_at))
         .offset(skip)
         .limit(limit)
         .all()
