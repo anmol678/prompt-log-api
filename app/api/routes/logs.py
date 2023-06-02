@@ -10,7 +10,7 @@ router = APIRouter()
 
 @router.post("/logs", response_model=RequestResponse)
 def create_log(*, db: Session = Depends(dependencies.get_db), request_in: Request):
-    log = crud_log.create(db=db, obj_in=request_in)
+    log = crud_log.create(db=db, request=request_in)
     if not log:
         raise HTTPException(
             status_code=400,

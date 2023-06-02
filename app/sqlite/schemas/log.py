@@ -25,9 +25,4 @@ class Log(Base):
     project_id = Column(Integer, ForeignKey('projects.id'), nullable=True)
     project = relationship('Project', backref='logs', lazy='joined')
 
-    # metadata = Column(JSON)
     # score = Column(Integer)
-
-    # prompt_id = Column(String)
-    # prompt_input_variables = Column(JSON)
-    # prompt_version_number = Column(Integer)    

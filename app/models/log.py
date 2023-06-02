@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
-from .project import Project
+from app.models.project import Project
 
 
 class LogBase(BaseModel):
@@ -33,3 +33,4 @@ class Log(LogBase):
     # prompt_version_number: int | None
 
     # score: int | None
+    

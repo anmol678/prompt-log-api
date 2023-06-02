@@ -7,18 +7,35 @@ from app.utils.cost import CostCalculator
 from app.crud import crud_project
 
 
-def create(db: Session, obj_in: Request) -> Log:
-    db_log = request_to_log(db, request=obj_in)
+def create(db: Session, request: Request) -> Log:
+    db_log = request_to_log(db, request=request)
     db.add(db_log)
     db.commit()
     db.refresh(db_log)
     return db_log
 
 def get(db: Session, id: int) -> Log:
-    return db.query(Log).filter(Log.id == id).first()
+    return (
+        db.query(Log)
+        .filter(Log.id == id)
+        .first()
+    )
 
 def get_multi(db: Session, skip: int = 0, limit: int = 100) -> list[Log]:
-    return db.query(Log).order_by(desc(Log.request_start_time)).offset(skip).limit(limit).all()
+    return (
+        db.query(Log)
+        .order_by(desc(Log.request_start_time))
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+def get(db: Session, ids: list[int]) -> list[Log]:
+    return (
+        db.query(Log)
+        .filter(Log.id.in_(ids))
+        .all()
+    )
 
 def update(db: Session, db_obj: Log, obj_in: Log) -> Log:
     for key, value in obj_in.dict().items():
@@ -33,13 +50,7 @@ def delete(db: Session, id: int):
     db.commit()
 
 def request_to_log(db: Session, request: Request) -> Log:
-
-    # project, metadata, score, prompt_template
-
-    # request_start_time = datetime.strptime(request.request_start_time, "%Y-%m-%d %H:%M:%S")
-    # request_end_time = datetime.strptime(request.request_end_time, "%Y-%m-%d %H:%M:%S")
-
-    log = Log(
+    return Log(
         function_name=request.function_name,
         prompt=request.function_args,
         kwargs=request.function_kwargs,
@@ -55,10 +66,4 @@ def request_to_log(db: Session, request: Request) -> Log:
         tags=request.tags,
         project_id=(crud_project.get_or_create(db, request.metadata['project']).id 
                     if request.metadata and 'project' in request.metadata else None)
-
-
-        # prompt_id=request.prompt_id,
-        # prompt_input_variables=request.prompt_input_variables,
-        # prompt_version_number=request.prompt_version,
     )
-    return log
