@@ -17,10 +17,10 @@ class LogBase(BaseModel):
     cost: float
 
     tags: list[str]
+    project: Project | None = None
 
 class Log(LogBase):
     id: int
-    project: Project | None = None
 
     class Config:
         orm_mode = True

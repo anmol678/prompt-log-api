@@ -23,7 +23,7 @@ class Log(Base):
     tags = Column(JSON)
 
     project_id = Column(Integer, ForeignKey('projects.id'), nullable=True)
-    project = relationship('Project', back_populates='logs')
+    project = relationship('Project', backref='logs', lazy='joined')
 
     # metadata = Column(JSON)
     # score = Column(Integer)

@@ -9,5 +9,3 @@ class Project(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String)
     tags = Column(JSON)
-
-    logs = relationship('Log', back_populates='project')
