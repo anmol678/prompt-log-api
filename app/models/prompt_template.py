@@ -13,12 +13,10 @@ class TemplateCreate(TemplateBase):
 
 class Template(TemplateBase):
     id: int
-    parent_template_id: int
+    version: int
 
     created_at: datetime
     last_used: datetime | None
-
-    version: int
 
     class Config:
         orm_mode = True
