@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from datetime import datetime
 
 
 class ProjectBase(BaseModel):
@@ -14,4 +13,4 @@ class Project(ProjectBase):
 
     class Config:
         orm_mode = True
-
+        
