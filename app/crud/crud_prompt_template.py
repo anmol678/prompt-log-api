@@ -7,12 +7,12 @@ from app.crud import crud_project
 from app.models.exceptions import DatabaseError
 
 
-def create_template(db: Session, template: TemplateCreate, parent_template_id: int) -> Template:
+def create_template(db: Session, template: TemplateCreate, parent_template_id: int, version: int = 1) -> Template:
     db_template = Template(
         prompt=template.prompt,
         input_variables=template.input_variables,
         format=template.format,
-        version=1,
+        version=version,
         parent_template_id=parent_template_id,
         created_at=datetime.utcnow(),
         last_used=None
@@ -73,7 +73,7 @@ def update_with_template(db: Session, id: int, prompt_template: PromptTemplatePa
         db_prompt_template.project_id = crud_project.get_or_create(db, title=prompt_template.project).id
     
     if prompt_template.template is not None:
-        create_template(db, template=prompt_template.template, parent_template_id=id)
+        create_template(db, template=prompt_template.template, parent_template_id=id, version=(len(db_prompt_template.templates)+1))
 
     db.commit()
     db.refresh(db_prompt_template)
@@ -83,3 +83,4 @@ def delete(db: Session, id: int):
     db_obj = get(db, id=id)
     db.delete(db_obj)
     db.commit()
+  
