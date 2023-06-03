@@ -39,15 +39,20 @@ def create_prompt_template(db: Session, prompt_template: PromptTemplateCreate) -
 
 def create_with_template(db: Session, prompt_template: PromptTemplateCreate) -> PromptTemplate:
     db_prompt_template = create_prompt_template(db, prompt_template=prompt_template)
-    create_template(db, template=prompt_template.template, parent_template_id=db_prompt_template.id)
+    create_template(db, 
+                    template=prompt_template.template, 
+                    parent_template_id=db_prompt_template.id)
     return db_prompt_template
 
 def get(db: Session, id: int) -> PromptTemplate:
-    return (
+    db_prompt_template = (
         db.query(PromptTemplate)
         .filter(PromptTemplate.id == id)
         .first()
     )
+    if not db_prompt_template:
+        raise DatabaseError("Prompt Template not found", 404)
+    return db_prompt_template
 
 def get_multi(db: Session, skip: int = 0, limit: int = 100) -> list[PromptTemplate]:
     return (
@@ -60,9 +65,6 @@ def get_multi(db: Session, skip: int = 0, limit: int = 100) -> list[PromptTempla
 def update_with_template(db: Session, id: int, prompt_template: PromptTemplatePatch) -> PromptTemplate:
     db_prompt_template = get(db, id=id)
 
-    if db_prompt_template is None:
-        raise DatabaseError("Prompt Template not found")
-
     if prompt_template.title is not None:
         db_prompt_template.title = prompt_template.title
 
@@ -73,7 +75,10 @@ def update_with_template(db: Session, id: int, prompt_template: PromptTemplatePa
         db_prompt_template.project_id = crud_project.get_or_create(db, title=prompt_template.project).id
     
     if prompt_template.template is not None:
-        create_template(db, template=prompt_template.template, parent_template_id=id, version=(len(db_prompt_template.templates)+1))
+        create_template(db, 
+                        template=prompt_template.template, 
+                        parent_template_id=id, 
+                        version=(len(db_prompt_template.templates)+1))
 
     db.commit()
     db.refresh(db_prompt_template)
