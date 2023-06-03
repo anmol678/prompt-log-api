@@ -1,5 +1,4 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import desc
 from app.sqlite.schemas.prompt_template import Template, PromptTemplate
 from app.models.prompt_template import TemplateCreate, PromptTemplateCreate, PromptTemplatePatch
 from datetime import datetime
@@ -53,7 +52,7 @@ def get(db: Session, id: int) -> PromptTemplate:
         .filter(PromptTemplate.id == id)
         .first()
     )
-    if not db_prompt_template:
+    if db_prompt_template is None:
         raise DatabaseError("Prompt Template not found", 404)
     return db_prompt_template
 
@@ -64,6 +63,27 @@ def get_multi(db: Session, skip: int = 0, limit: int = 100) -> list[PromptTempla
         .offset(skip)
         .limit(limit)
         .all()
+    )
+
+def get_template_version(db: Session, id: int, version: int) -> Template:
+    db_template = (
+        db.query(Template)
+        .filter(
+            Template.parent_template_id == id, 
+            Template.version == version
+        )
+        .first()
+    )
+    if db_template is None:
+        raise DatabaseError("Template version not found", 404)
+    return db_template
+
+def get_latest_template_version(db: Session, id: int) -> Template:
+    return (
+        db.query(Template)
+        .filter(Template.parent_template_id == id)
+        .order_by(Template.version.desc())
+        .first()
     )
 
 def update_with_template(db: Session, id: int, prompt_template: PromptTemplatePatch) -> PromptTemplate:
