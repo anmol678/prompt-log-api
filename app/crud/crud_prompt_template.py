@@ -57,6 +57,7 @@ def get(db: Session, id: int) -> PromptTemplate:
 def get_multi(db: Session, skip: int = 0, limit: int = 100) -> list[PromptTemplate]:
     return (
         db.query(PromptTemplate)
+        .filter(PromptTemplate.deleted_at == None)
         .offset(skip)
         .limit(limit)
         .all()
@@ -87,5 +88,10 @@ def update_with_template(db: Session, id: int, prompt_template: PromptTemplatePa
 def delete(db: Session, id: int):
     db_obj = get(db, id=id)
     db.delete(db_obj)
+    db.commit()
+
+def soft_delete(db: Session, id: int):
+    db_prompt_template = get(db, id=id)
+    db_prompt_template.deleted_at = datetime.utcnow()
     db.commit()
   

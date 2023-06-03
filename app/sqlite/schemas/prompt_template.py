@@ -30,3 +30,5 @@ class PromptTemplate(Base):
     
     project_id = Column(Integer, ForeignKey('projects.id'))
     project = relationship('Project', backref='prompt_templates', lazy='joined')
+
+    deleted_at = Column(DateTime, nullable=True)

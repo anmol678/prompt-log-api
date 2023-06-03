@@ -49,3 +49,17 @@ def update_prompt_template(*, db: Session = Depends(dependencies.get_db), id: in
             detail="Prompt Template not found",
         )
     return prompt_template
+
+
+@router.delete("/prompt-templates/{id}")
+def delete_prompt_template(*, db: Session = Depends(dependencies.get_db), id: int, hard: bool | None = None):
+    try:
+        if hard:
+            crud_prompt_template.delete(db, id=id)
+        else:
+            crud_prompt_template.soft_delete(db, id=id)
+    except DatabaseError as e:
+        raise HTTPException(
+            status_code=e.code,
+            detail=str(e.message),
+        )
