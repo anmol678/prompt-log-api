@@ -28,7 +28,7 @@ class PromptTemplate(Base):
 
     tags = Column(JSON)
     
-    project_id = Column(Integer, ForeignKey('projects.id'))
+    project_id = Column(Integer, ForeignKey('projects.id'), nullable=True)
     project = relationship('Project', backref='prompt_templates', lazy='joined')
 
     deleted_at = Column(DateTime, nullable=True)

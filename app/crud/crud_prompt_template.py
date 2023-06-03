@@ -28,7 +28,10 @@ def create_prompt_template(db: Session, prompt_template: PromptTemplateCreate) -
     db_prompt_template = PromptTemplate(
         title=prompt_template.title,
         tags=prompt_template.tags,
-        project_id=crud_project.get_or_create(db, title=prompt_template.project).id
+        project_id=(
+            crud_project.get_or_create(db, title=prompt_template.project).id
+            if prompt_template.project else None
+        )
     )
     db.add(db_prompt_template)
     db.commit()
