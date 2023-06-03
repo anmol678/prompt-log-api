@@ -5,7 +5,7 @@ from app.models.project import Project
 
 class TemplateBase(BaseModel):
     prompt: str
-    input_variables: dict
+    input_variables: list[str]
     format: str
 
 class TemplateCreate(TemplateBase):
