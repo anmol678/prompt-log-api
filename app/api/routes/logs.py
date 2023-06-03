@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app import dependencies
-from app.models.log import Log
+from app.models.log import Log, LogWithPromptVersion
 from app.models.request import Request, RequestResponse
 from app.crud import crud_log, crud_prompt_template_log
 from app.models.exceptions import DatabaseError
@@ -40,7 +40,7 @@ def get_log(*, db: Session = Depends(dependencies.get_db), id: int):
     return log
 
 
-@router.get("/logs/prompt-template/{prompt_template_id}", response_model=list[Log])
+@router.get("/logs/prompt-template/{prompt_template_id}", response_model=list[LogWithPromptVersion])
 def get_logs_for_prompt_template(*, db: Session = Depends(dependencies.get_db), prompt_template_id: int):
     logs = crud_log.get_for_prompt_template(db, prompt_template_id=prompt_template_id)
     return logs

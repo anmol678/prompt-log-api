@@ -19,18 +19,18 @@ class LogBase(BaseModel):
     tags: list[str]
     project: Project | None = None
 
+class LogWithPromptVersion(LogBase):
+    id: int
+    version_number: int
+
+    class Config:
+        orm_mode = True
+
 class Log(LogBase):
     id: int
 
     class Config:
         orm_mode = True
-    
-
-    # metadata: dict[str, str | None]
-    
-    # prompt_id: str | None
-    # prompt_input_variables: dict[str, str | None]
-    # prompt_version_number: int | None
 
     # score: int | None
     

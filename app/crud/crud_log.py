@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from app.models.request import Request
 from app.sqlite.schemas.log import Log
+from app.models.log import Log as LogPy, LogWithPromptVersion
 from app.utils.cost import CostCalculator
 from app.crud import crud_project, crud_prompt_template_log
 from app.models.exceptions import DatabaseError
@@ -60,18 +61,18 @@ def get_multi_by_id(db: Session, ids: list[int]) -> list[Log]:
         .all()
     )
 
-def get_for_prompt_template(db: Session, prompt_template_id: int) -> list[Log]:
+def get_for_prompt_template(db: Session, prompt_template_id: int) -> LogWithPromptVersion:
     pt_logs = crud_prompt_template_log.get_by_prompt_template(db, id=prompt_template_id)
     log_ids = [pt_log.log_id for pt_log in pt_logs]
     logs = get_multi_by_id(db, ids=log_ids)
     log_id_to_version = {pt_log.log_id: pt_log.version_number for pt_log in pt_logs}
 
+    logs_with_versions = []
     for log in logs:
-        log_dict = log.dict()
+        log_dict = LogPy.from_orm(log).dict()
         log_dict['version_number'] = log_id_to_version[log.id]
-        logs.append(log_dict)
-
-    return logs
+        logs_with_versions.append(log_dict)
+    return logs_with_versions
 
 def update(db: Session, id: int, log: Log) -> Log:
     db_log = get(db, id=id)
