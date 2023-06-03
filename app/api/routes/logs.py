@@ -1,21 +1,23 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app import dependencies
 from app.models.log import Log
 from app.models.request import Request, RequestResponse
 from app.crud import crud_log
+from app.models.exceptions import DatabaseError
 
 
 router = APIRouter()
 
 
-@router.post("/logs", response_model=RequestResponse)
+@router.post("/logs", response_model=RequestResponse, status_code=status.HTTP_201_CREATED)
 def create_log(*, db: Session = Depends(dependencies.get_db), request_in: Request):
-    log = crud_log.create(db, request=request_in)
-    if not log:
+    try:
+        log = crud_log.create(db, request=request_in)
+    except DatabaseError as e:
         raise HTTPException(
-            status_code=400,
-            detail="Error while creating Log",
+            status_code=e.code,
+            detail=e.message,
         )
     return RequestResponse(request_id=log.id)
 
@@ -28,11 +30,12 @@ def get_logs(*, db: Session = Depends(dependencies.get_db)):
 
 @router.get("/logs/{id}", response_model=Log)
 def get_log(*, db: Session = Depends(dependencies.get_db), id: int):
-    log = crud_log.get(db, id=id)
-    if not log:
+    try:
+        log = crud_log.get(db, id=id)
+    except DatabaseError as e:
         raise HTTPException(
-            status_code=404,
-            detail="Log not found",
+            status_code=e.code,
+            detail=e.message,
         )
     return log
 
@@ -40,9 +43,4 @@ def get_log(*, db: Session = Depends(dependencies.get_db), id: int):
 @router.get("/logs/prompt-template/{prompt_template_id}", response_model=list[Log])
 def get_logs_for_prompt_template(*, db: Session = Depends(dependencies.get_db), prompt_template_id: int):
     logs = crud_log.get_for_prompt_template(db, prompt_template_id=prompt_template_id)
-    if not logs:
-        raise HTTPException(
-            status_code=404,
-            detail="Logs not found",
-        )
     return logs

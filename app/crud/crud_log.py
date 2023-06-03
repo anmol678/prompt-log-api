@@ -1,10 +1,10 @@
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from app.models.request import Request
 from app.sqlite.schemas.log import Log
-from datetime import datetime
 from app.utils.cost import CostCalculator
 from app.crud import crud_project, crud_prompt_template_log
+from app.models.exceptions import DatabaseError
 
 
 def create(db: Session, request: Request) -> Log:
@@ -30,14 +30,19 @@ def create(db: Session, request: Request) -> Log:
     db.add(db_log)
     db.commit()
     db.refresh(db_log)
+    if db_log is None:
+        raise DatabaseError("Error while logging request")
     return db_log
 
 def get(db: Session, id: int) -> Log:
-    return (
+    db_log = (
         db.query(Log)
         .filter(Log.id == id)
         .first()
     )
+    if db_log is None:
+        raise DatabaseError("Request Log not found", 404)
+    return db_log
 
 def get_multi(db: Session, skip: int = 0, limit: int = 100) -> list[Log]:
     return (
@@ -68,14 +73,15 @@ def get_for_prompt_template(db: Session, prompt_template_id: int) -> list[Log]:
 
     return logs
 
-def update(db: Session, db_obj: Log, obj_in: Log) -> Log:
-    for key, value in obj_in.dict().items():
-        setattr(db_obj, key, value)
+def update(db: Session, id: int, log: Log) -> Log:
+    db_log = get(db, id=id)
+    for key, value in log.dict().items():
+        setattr(db_log, key, value)
     db.commit()
-    db.refresh(db_obj)
-    return db_obj
+    db.refresh(db_log)
+    return db_log
 
 def delete(db: Session, id: int):
-    db_obj = get(db, id=id)
-    db.delete(db_obj)
+    db_log = get(db, id=id)
+    db.delete(db_log)
     db.commit()
