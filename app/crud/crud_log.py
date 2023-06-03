@@ -8,7 +8,25 @@ from app.crud import crud_project, crud_prompt_template_log
 
 
 def create(db: Session, request: Request) -> Log:
-    db_log = request_to_log(db, request=request)
+    db_log = Log(
+        function_name=request.function_name,
+        prompt=request.function_args,
+        kwargs=request.function_kwargs,
+        
+        request_start_time=request.request_start_time,
+        request_end_time=request.request_end_time,
+        response=request.request_response,
+        
+        provider_type=request.provider_type,
+        token_usage=request.request_usage,
+        cost=CostCalculator().calculate_cost(usage=request.request_usage, kwargs=request.function_kwargs),
+        
+        tags=request.tags,
+        project_id=(
+            crud_project.get_or_create(db, title=request.metadata['project']).id 
+            if request.metadata and 'project' in request.metadata and request.metadata['project'] else None
+        )
+    )
     db.add(db_log)
     db.commit()
     db.refresh(db_log)
@@ -61,22 +79,3 @@ def delete(db: Session, id: int):
     db_obj = get(db, id=id)
     db.delete(db_obj)
     db.commit()
-
-def request_to_log(db: Session, request: Request) -> Log:
-    return Log(
-        function_name=request.function_name,
-        prompt=request.function_args,
-        kwargs=request.function_kwargs,
-        
-        request_start_time=request.request_start_time,
-        request_end_time=request.request_end_time,
-        response=request.request_response,
-        
-        provider_type=request.provider_type,
-        token_usage=request.request_usage,
-        cost=CostCalculator().calculate_cost(usage=request.request_usage, kwargs=request.function_kwargs),
-        
-        tags=request.tags,
-        project_id=(crud_project.get_or_create(db, title=request.metadata['project']).id 
-                    if request.metadata and 'project' in request.metadata else None)
-    )
