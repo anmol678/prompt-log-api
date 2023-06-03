@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app import dependencies
 from app.models.prompt_template import PromptTemplate, PromptTemplateCreate, PromptTemplatePatch
@@ -9,7 +9,7 @@ from app.models.exceptions import DatabaseError
 router = APIRouter()
 
 
-@router.post("/prompt-templates", response_model=PromptTemplate)
+@router.post("/prompt-templates", response_model=PromptTemplate, status_code=status.HTTP_201_CREATED)
 def create_prompt_template(*, db: Session = Depends(dependencies.get_db), prompt_template_in: PromptTemplateCreate):
     try:
         prompt_template = crud_prompt_template.create_with_template(db, prompt_template=prompt_template_in)
@@ -51,7 +51,7 @@ def update_prompt_template(*, db: Session = Depends(dependencies.get_db), id: in
     return prompt_template
 
 
-@router.delete("/prompt-templates/{id}")
+@router.delete("/prompt-templates/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_prompt_template(*, db: Session = Depends(dependencies.get_db), id: int, hard: bool | None = None):
     try:
         if hard:
