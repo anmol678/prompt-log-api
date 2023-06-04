@@ -11,6 +11,13 @@ def get_by_prompt_template(db: Session, id: int) -> list[PromptTemplateLog]:
         .all()
     )
 
+def get_by_log(db: Session, id: int) -> list[PromptTemplateLog]:
+    return (
+        db.query(PromptTemplateLog)
+        .filter(PromptTemplateLog.log_id == id)
+        .all()
+    )
+
 def create(db: Session, log_id: int, prompt_template_id: int, version_number: int) -> PromptTemplateLog:
     db_ptl = PromptTemplateLog(
         log_id=log_id,

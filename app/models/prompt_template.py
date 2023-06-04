@@ -35,6 +35,13 @@ class PromptTemplate(PromptTemplateBase):
 
     templates: list[Template]
     project: Project | None
+
+    class Config:
+        orm_mode = True
+
+class PromptTemplateWithVersion(PromptTemplateBase):
+    id: int
+    version_number: int
     
     class Config:
         orm_mode = True

@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from app.sqlite.schemas.prompt_template import Template, PromptTemplate
-from app.models.prompt_template import TemplateCreate, PromptTemplateCreate, PromptTemplatePatch
+from app.models.prompt_template import TemplateCreate, PromptTemplateCreate, PromptTemplatePatch, PromptTemplateWithVersion, PromptTemplate as PromptTemplatePy
 from datetime import datetime
-from app.crud import crud_project
+from app.crud import crud_project, crud_prompt_template_log
 from app.models.exceptions import DatabaseError
 
 
@@ -65,6 +65,14 @@ def get_multi(db: Session, skip: int = 0, limit: int = 100) -> list[PromptTempla
         .all()
     )
 
+def get_multi_by_id(db: Session, ids: list[int]) -> list[PromptTemplate]:
+    return (
+        db.query(PromptTemplate)
+        .filter(PromptTemplate.id.in_(ids))
+        .filter(PromptTemplate.deleted_at == None)
+        .all()
+    )
+
 def get_template_version(db: Session, id: int, version: int) -> Template:
     db_template = (
         db.query(Template)
@@ -85,6 +93,19 @@ def get_latest_template_version(db: Session, id: int) -> Template:
         .order_by(Template.version.desc())
         .first()
     )
+
+def get_for_log(db: Session, log_id: int) -> list[PromptTemplateWithVersion]:
+    pt_logs = crud_prompt_template_log.get_by_log(db, id=log_id)
+    prompt_template_ids = [pt_log.prompt_template_id for pt_log in pt_logs]
+    prompt_templates = get_multi_by_id(db, ids=prompt_template_ids)
+    prompt_template_id_to_version = {pt_log.prompt_template_id: pt_log.version_number for pt_log in pt_logs}
+
+    prompt_templates_with_version = []
+    for prompt_template in prompt_templates:
+        prompt_template_dict = PromptTemplatePy.from_orm(prompt_template).dict()
+        prompt_template_dict['version_number'] = prompt_template_id_to_version[prompt_template.id]
+        prompt_templates_with_version.append(prompt_template_dict)
+    return prompt_templates_with_version
 
 def update_with_template(db: Session, id: int, prompt_template: PromptTemplatePatch) -> PromptTemplate:
     db_prompt_template = get(db, id=id)
