@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 from app.models.project import Project
-
+from app.models.prompt_template import PromptTemplateWithVersion
 
 class LogBase(BaseModel):
     function_name: str
@@ -28,6 +28,7 @@ class LogWithPromptVersion(LogBase):
 
 class Log(LogBase):
     id: int
+    prompt_templates: list[PromptTemplateWithVersion] = []
 
     class Config:
         orm_mode = True

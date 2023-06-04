@@ -7,6 +7,7 @@ from app.crud import crud_log, crud_prompt_template_log
 from app.models.exceptions import DatabaseError
 from app.models.prompt_template_log import PromptTemplateLogCreate
 
+
 router = APIRouter()
 
 
@@ -24,7 +25,13 @@ def create_log(*, db: Session = Depends(dependencies.get_db), request_in: Reques
 
 @router.get("/logs", response_model=list[Log])
 def get_logs(*, db: Session = Depends(dependencies.get_db)):
-    logs = crud_log.get_multi(db)
+    try:
+        logs = crud_log.get_multi_with_prompt_templates(db)
+    except DatabaseError as e:
+        raise HTTPException(
+            status_code=e.code,
+            detail=e.message,
+        )
     return logs
 
 
