@@ -38,7 +38,7 @@ def get_logs(*, db: Session = Depends(dependencies.get_db)):
 @router.get("/logs/{id}", response_model=Log)
 def get_log(*, db: Session = Depends(dependencies.get_db), id: int):
     try:
-        log = crud_log.get(db, id=id)
+        log = crud_log.get_with_prompt_templates(db, id=id)
     except DatabaseError as e:
         raise HTTPException(
             status_code=e.code,

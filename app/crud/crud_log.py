@@ -131,6 +131,43 @@ def get_multi_with_prompt_templates(db: Session) -> list[LogPy]:
     result_logs.sort(key=lambda x: x.request_start_time, reverse=True)
     return result_logs
 
+def get_with_prompt_templates(db: Session, id: int) -> LogPy:
+    log_entries = db.query(Log,
+                    PromptTemplate,
+                    PromptTemplateLog.version_number)\
+              .outerjoin(PromptTemplateLog,
+                    Log.id == PromptTemplateLog.log_id)\
+              .outerjoin(PromptTemplate,
+                    PromptTemplateLog.prompt_template_id == PromptTemplate.id)\
+              .filter(Log.id == id)\
+              .all()
+
+    prompt_templates = []
+    log = None
+    for log, prompt_template, version in log_entries:
+        if prompt_template is not None:
+            prompt_templates.append(
+                PromptTemplateWithVersion(**prompt_template.__dict__, version_number=version)
+            )
+
+    if log is None:
+        raise DatabaseError("Request Log not found", 404)
+
+    return LogPy(
+        id=log.id,
+        function_name=log.function_name,
+        prompt=log.prompt,
+        kwargs=log.kwargs,
+        request_start_time=log.request_start_time,
+        request_end_time=log.request_end_time,
+        response=log.response,
+        provider_type=log.provider_type,
+        token_usage=log.token_usage,
+        cost=log.cost,
+        tags=log.tags,
+        project=log.project,
+        prompt_templates=prompt_templates
+    )
 
 def get_for_prompt_template(db: Session, prompt_template_id: int) -> LogWithPromptVersion:
     pt_logs = crud_prompt_template_log.get_by_prompt_template(db, id=prompt_template_id)
