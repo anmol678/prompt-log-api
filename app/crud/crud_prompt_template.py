@@ -60,6 +60,7 @@ def get_multi(db: Session, skip: int = 0, limit: int = 100) -> list[PromptTempla
     return (
         db.query(PromptTemplate)
         .filter(PromptTemplate.deleted_at == None)
+        .order_by(PromptTemplate.id.asc())
         .offset(skip)
         .limit(limit)
         .all()
