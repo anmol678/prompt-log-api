@@ -120,10 +120,12 @@ def update_with_template(db: Session, id: int, prompt_template: PromptTemplatePa
         db_prompt_template.project_id = crud_project.get_or_create(db, title=prompt_template.project).id
     
     if prompt_template.template is not None:
-        create_template(db, 
-                        template=prompt_template.template, 
-                        parent_template_id=id, 
-                        version=(len(db_prompt_template.templates)+1))
+        latest_template = db_prompt_template.templates[0]
+        if latest_template.prompt != prompt_template.template.prompt or latest_template.input_variables != prompt_template.template.input_variables:
+            create_template(db, 
+                            template=prompt_template.template, 
+                            parent_template_id=id, 
+                            version=(len(db_prompt_template.templates)+1))
 
     db.commit()
     db.refresh(db_prompt_template)
