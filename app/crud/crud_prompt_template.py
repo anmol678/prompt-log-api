@@ -118,6 +118,8 @@ def update_with_template(db: Session, id: int, prompt_template: PromptTemplatePa
 
     if prompt_template.project is not None:
         db_prompt_template.project_id = crud_project.get_or_create(db, title=prompt_template.project).id
+    else:
+        db_prompt_template.project_id = None
     
     if prompt_template.template is not None:
         latest_template = db_prompt_template.templates[0]
