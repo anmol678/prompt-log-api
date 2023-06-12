@@ -24,7 +24,7 @@ class PromptTemplate(Base):
     id = Column(Integer, primary_key=True)
 
     title = Column(String)
-    templates = relationship('Template', lazy='joined', cascade='all, delete-orphan')
+    templates = relationship('Template', lazy='joined', cascade='all, delete-orphan', order_by='desc(Template.version)')
 
     tags = Column(JSON)
     
