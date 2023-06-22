@@ -2,25 +2,50 @@ init:
 	python3 -m venv venv
 	source venv/bin/activate && pip install --upgrade pip wheel
 	if [ -f requirements.txt ]; then source venv/bin/activate && pip install -r requirements.txt; fi
+	source venv/bin/activate && pip install python-dotenv
 
-test:
-	source venv/bin/activate && pytest
+test-dev:
+	source venv/bin/activate && export $(shell cat .env.dev | xargs) && pytest
 
-run:
-	source venv/bin/activate && uvicorn main:app --reload
+test-prod:
+	source venv/bin/activate && export $(shell cat .env.prod | xargs) && pytest
 
-migration:
+run-dev:
+	source venv/bin/activate && export $(shell cat .env.dev | xargs) && uvicorn main:app --reload
+
+run-prod:
+	source venv/bin/activate && export $(shell cat .env.prod | xargs) && uvicorn main:app --reload
+
+migration-dev:
 	@if [ -z "$(message)" ]; then \
 		echo "Please provide a migration message. Example: make migrate message='Version 1'"; \
 	else \
-		source venv/bin/activate && alembic revision --autogenerate -m "$(message)"; \
+		source venv/bin/activate && export $(shell cat .env.dev | xargs) && \
+		python alembic_config.py && \
+		alembic revision --autogenerate -m "$(message)"; \
 		alembic upgrade head; \
 	fi
 
-lint:
-	source venv/bin/activate && flake8 app
+migration-prod:
+	@if [ -z "$(message)" ]; then \
+		echo "Please provide a migration message. Example: make migrate message='Version 1'"; \
+	else \
+		source venv/bin/activate && export $(shell cat .env.prod | xargs) && \
+		python alembic_config.py && \
+		alembic revision --autogenerate -m "$(message)"; \
+		alembic upgrade head; \
+	fi
 
-format:
-	source venv/bin/activate && black app
+lint-dev:
+	source venv/bin/activate && export $(shell cat .env.dev | xargs) && flake8 app
 
-.PHONY: init test run lint format
+lint-prod:
+	source venv/bin/activate && export $(shell cat .env.prod | xargs) && flake8 app
+
+format-dev:
+	source venv/bin/activate && export $(shell cat .env.dev | xargs) && black app
+
+format-prod:
+	source venv/bin/activate && export $(shell cat .env.prod | xargs) && black app
+
+.PHONY: init test-dev test-prod run-dev run-prod migration-dev migration-prod lint-dev lint-prod format-dev format-prod
