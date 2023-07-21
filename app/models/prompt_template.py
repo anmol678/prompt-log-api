@@ -19,7 +19,7 @@ class Template(TemplateBase):
     last_used: datetime | None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class PromptTemplateBase(BaseModel):
@@ -37,14 +37,14 @@ class PromptTemplate(PromptTemplateBase):
     project: Project | None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class PromptTemplateWithVersion(PromptTemplateBase):
     id: int
     version_number: int
     
     class Config:
-        orm_mode = True
+        from_attributes = True
         
 class PromptTemplatePatch(BaseModel):
     title: str | None = None

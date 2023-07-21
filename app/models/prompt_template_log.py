@@ -8,7 +8,7 @@ class PromptTemplateLog(BaseModel):
     version_number: int
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class PromptTemplateLogCreate(BaseModel):
     prompt_template_id: int

@@ -24,14 +24,14 @@ class LogWithPromptVersion(LogBase):
     version_number: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class Log(LogBase):
     id: int
     prompt_templates: list[PromptTemplateWithVersion] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
     # score: int | None
     
