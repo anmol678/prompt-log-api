@@ -11,10 +11,10 @@ test-prod:
 	source venv/bin/activate && export $(shell cat .env.prod | xargs) && pytest
 
 run-dev:
-	source venv/bin/activate && export $(shell cat .env.dev | xargs) && uvicorn main:app --reload
+	source venv/bin/activate && export $(shell cat .env.dev | xargs) && uvicorn main:app --reload --host 0.0.0.0 --port 4000
 
 run-prod:
-	source venv/bin/activate && export $(shell cat .env.prod | xargs) && uvicorn main:app --reload
+	source venv/bin/activate && export $(shell cat .env.prod | xargs) && uvicorn main:app --reload --host 0.0.0.0 --port 4000
 
 migration-dev:
 	@if [ -z "$(message)" ]; then \
