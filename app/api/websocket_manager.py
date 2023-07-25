@@ -24,7 +24,7 @@ class ConnectionManager:
     async def send_notification(self):
         self.new_logs.pop()
         for client_id in self.active_connections.keys():
-            await self.send_message(client_id, "new logs")
+            await self.send_message(client_id, "NEW_LOGS")
 
 
 manager = ConnectionManager()
