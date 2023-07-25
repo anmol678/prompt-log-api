@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from app import dependencies
 from app.models.log import Log, LogWithPromptVersion
@@ -6,15 +6,18 @@ from app.models.request import Request, RequestResponse
 from app.crud import crud_log, crud_prompt_template_log
 from app.models.exceptions import DatabaseError
 from app.models.prompt_template_log import PromptTemplateLogCreate
+from app.api.websocket_manager import manager
 
 
 router = APIRouter()
 
 
 @router.post("/logs", response_model=RequestResponse, status_code=status.HTTP_201_CREATED)
-def create_log(*, db: Session = Depends(dependencies.get_db), request_in: Request):
+def create_log(*, db: Session = Depends(dependencies.get_db), request_in: Request, background_tasks: BackgroundTasks):
     try:
         log = crud_log.create(db, request=request_in)
+        manager.add_log(log)
+        background_tasks.add_task(manager.send_notification)
     except DatabaseError as e:
         raise HTTPException(
             status_code=e.code,
