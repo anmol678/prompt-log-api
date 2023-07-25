@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.errors.handlers import http_exception_handler
 from app.api import api_router as router
 
+
 app = FastAPI()
 
 app.add_exception_handler(HTTPException, http_exception_handler)
